@@ -50,4 +50,4 @@ public class ilustrasi extends JPanel {
         g.setColor(Color.RED);
         g.drawLine(lineX2, lineY1, lineX1, lineY2);
     }
-}
+// }dsfsdfsdfdsd

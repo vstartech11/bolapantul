@@ -6,14 +6,14 @@ import javax.swing.event.*;
 public class Progres4 extends JPanel implements ChangeListener, ActionListener {
     private int x = 0;
     private int y = 450;
-    private int width = 120;
-    private int height = 120;
     private static int widthCanvas = 1050;
     private static int heightCanvas = 750;
+    private int width = 120;
+    private int height = 120;
     private JSlider sliderX;
     private JScrollBar scrollY;
-    private JToggleButton gravityToggleButton;
     private boolean isGravityEnabled;
+    private JToggleButton gravityToggleButton;
 
     public Progres4() {
         setLayout(null);

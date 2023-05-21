@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
+
 public class Progres4 extends JPanel implements ChangeListener, ActionListener {
     private int x = 0;
     private int y = 450;

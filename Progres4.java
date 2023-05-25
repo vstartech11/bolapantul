@@ -8,8 +8,8 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
     private int y = 450;
     private static int widthCanvas = 1050;
     private static int heightCanvas = 750;
-    private int width = 120;
-    private int height = 120;
+    private int width = 160;
+    private int height = 160;
     private JSlider sliderX;
     private JScrollBar scrollY;
     private boolean isGravityEnabled;
@@ -56,16 +56,21 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
         g.drawLine(0, bottomY, getWidth(), bottomY);
         g.drawLine(1016,677,1016,35);
 
+        // Size
+        double scale = (double)y / heightCanvas;
+        int scaledWidth = (int)(width * scale);
+        int scaledHeight = (int)(height * scale);
+        
         //Draw Circle
-        g.drawOval(x, y, width, height);
+        g.drawOval(x, y, scaledWidth, scaledHeight);
         g.setColor(Color.BLACK);
 
         // Hitung titik tengah lingkaran
-        int centerX = x + (width / 2);
-        int centerY = y + (height / 2);
+        int centerX = x + (scaledWidth / 2);
+        int centerY = y + (scaledHeight / 2);
 
         // Hitung panjang garis silang
-        double lineLength = Math.sqrt(2) * (width / 2);
+        double lineLength = Math.sqrt(2) * (scaledWidth / 2);
 
         // Hitung titik-titik ujung garis silang
         int lineX1 = centerX - (int) (lineLength / 2);

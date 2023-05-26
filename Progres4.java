@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.color.ColorSpace;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -192,8 +193,8 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
         int scaledHeight = (int)(height * scale);
         
         // Draw bola
-        g.drawOval(x, y, scaledWidth, scaledHeight);
-        g.setColor(Color.BLACK);
+        g.setColor(new Color(120, 255, 255));
+        g.fillOval(x, y, scaledWidth, scaledHeight);
 
         // Titik tengah
         int centerX = (x) + (scaledWidth / 2);

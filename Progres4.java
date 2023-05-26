@@ -14,10 +14,14 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
     private JScrollBar scrollY;
     private boolean isGravityEnabled;
     private JToggleButton gravityToggleButton;
+    private double velocityY = 0;
+    private double acceleration = 5;
+    private double elasticity = 0.8;
+    private boolean systemChangingSlider;
 
     public Progres4() {
         setLayout(null);
-        gravityToggleButton = new JToggleButton("Gravity: ON");
+        gravityToggleButton = new JToggleButton("Gravity: OFF");
         gravityToggleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -30,8 +34,26 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
 
         // Slider
         sliderX = new JSlider(JSlider.HORIZONTAL,0,896,x);
-        sliderX.addChangeListener(this);
+        sliderX.addChangeListener(e -> {
+            if (!systemChangingSlider) {
+                x = sliderX.getValue();
+                repaint();
+            }
+        });
         sliderX.setBounds(52, 678, 912, 20);
+        sliderX.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                isGravityEnabled = false;
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if(gravityToggleButton.isSelected()) {
+                    isGravityEnabled = true;
+                }
+            }
+        });
         add(sliderX);
 
         // Scrollbar
@@ -40,10 +62,48 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
             y = scrollY.getValue();
             repaint();
         });
+        scrollY.addAdjustmentListener(e -> {
+            if (!systemChangingSlider) {
+                y = scrollY.getValue();
+                repaint();
+            }
+        });
         scrollY.setBounds(1017, 54, 20, 602);
+        scrollY.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                isGravityEnabled = false;
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if(gravityToggleButton.isSelected()) {
+                    isGravityEnabled = true;
+                }
+            }
+        });
         add(scrollY);
 
         setOpaque(false);
+
+        new Timer(15, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(isGravityEnabled) {
+                    velocityY += acceleration;
+                    y += velocityY;
+                    if(y + height > heightCanvas-32) {
+                        velocityY = -elasticity * velocityY;
+                        y = (heightCanvas-32) - height;
+                    }
+                    // Sistem yang merubah slider agar tidak bentrok sama kondisi jika slider di tekan)
+                    systemChangingSlider = true;
+                    sliderX.setValue(x);
+                    scrollY.setValue(y);
+                    systemChangingSlider = false;
+                }
+                repaint();
+            }
+        }).start();
     }
 
     @Override
@@ -56,12 +116,12 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
         g.drawLine(0, bottomY, getWidth(), bottomY);
         g.drawLine(1016,677,1016,35);
 
-        // Size
+        // Size Bola
         double scale = (double)y / heightCanvas;
         int scaledWidth = (int)(width * scale);
         int scaledHeight = (int)(height * scale);
         
-        //Draw Circle
+        // Draw Circle
         g.drawOval(x, y, scaledWidth, scaledHeight);
         g.setColor(Color.BLACK);
 

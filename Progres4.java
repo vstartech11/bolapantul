@@ -13,11 +13,16 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
     private JSlider sliderX;
     private JScrollBar scrollY;
     private boolean isGravityEnabled;
+    private JTextField textField;
+    private JButton tombolKiri, tombolKanan;
     private JToggleButton gravityToggleButton;
     private double velocityY = 0;
-    private double acceleration = 5;
+    private double velocityX = 0;
+    private double acceleration = 10;
     private double elasticity = 0.8;
+    private double gesekan = 0.98;
     private boolean systemChangingSlider;
+
 
     public Progres4() {
         setLayout(null);
@@ -31,6 +36,43 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
         });
         gravityToggleButton.setBounds(5, 5, 150, 25);
         add(gravityToggleButton);
+
+        // Tombol kanan
+        tombolKanan = new JButton(">>");
+        tombolKanan.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    velocityX = Integer.parseInt(textField.getText());
+                } catch(NumberFormatException ex) {
+                    velocityX = 0;
+                }
+                textField.setText("");
+            }
+        });
+        tombolKanan.setBounds(554, 5, 50, 25);
+        add(tombolKanan);
+
+        // Tombol kiri
+        tombolKiri = new JButton("<<");
+        tombolKiri.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    velocityX = -Integer.parseInt(textField.getText());
+                } catch(NumberFormatException ex) {
+                    velocityX = 0;
+                }
+                textField.setText("");
+            }
+        });
+        tombolKiri.setBounds(415, 5, 50, 25);
+        add(tombolKiri);
+
+        // Input box
+        textField = new JTextField();
+        textField.setBounds(470, 5, 80, 26);
+        add(textField);
 
         // Slider
         sliderX = new JSlider(JSlider.HORIZONTAL,0,896,x);
@@ -86,8 +128,25 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
 
         setOpaque(false);
 
-        new Timer(15, new ActionListener() {
+        new Timer(30, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                velocityX *= gesekan;
+                if(Math.abs(velocityX) < 0.1) {
+                    velocityX = 0;
+                }
+
+                x += velocityX;
+                if(x < 0.1) {
+                    velocityX = -elasticity * velocityX;
+                    x = 0;
+                }
+                if(x + width > widthCanvas+10) {
+                    velocityX = -elasticity * velocityX;
+                    x = (widthCanvas+10) - width;
+                }
+                sliderX.setValue(x);
+                scrollY.setValue(y);
+                
                 if(isGravityEnabled) {
                     velocityY += acceleration;
                     y += velocityY;
@@ -95,7 +154,7 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
                         velocityY = -elasticity * velocityY;
                         y = (heightCanvas-32) - height;
                     }
-                    // Sistem yang merubah slider agar tidak bentrok sama kondisi jika slider di tekan)
+                    // Sistem yang merubah slider agar tidak bertabrakan sama kondisi jika slider di tekan)
                     systemChangingSlider = true;
                     sliderX.setValue(x);
                     scrollY.setValue(y);
@@ -104,6 +163,17 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
                 repaint();
             }
         }).start();
+    }
+
+    // Rotasi Bola
+    private void garis_dalam_bola(Graphics g, int centerX, int centerY, double radius, double angle, Color color) {
+        int x1 = centerX + (int) (radius * Math.cos(angle));
+        int y1 = centerY + (int) (radius * Math.sin(angle));
+        int x2 = centerX - (int) (radius * Math.cos(angle));
+        int y2 = centerY - (int) (radius * Math.sin(angle));
+        
+        g.setColor(color);
+        g.drawLine(x1, y1, x2, y2);
     }
 
     @Override
@@ -116,33 +186,28 @@ public class Progres4 extends JPanel implements ChangeListener, ActionListener {
         g.drawLine(0, bottomY, getWidth(), bottomY);
         g.drawLine(1016,677,1016,35);
 
-        // Size Bola
+        // Size bola
         double scale = (double)y / heightCanvas;
         int scaledWidth = (int)(width * scale);
         int scaledHeight = (int)(height * scale);
         
-        // Draw Circle
+        // Draw bola
         g.drawOval(x, y, scaledWidth, scaledHeight);
         g.setColor(Color.BLACK);
 
-        // Hitung titik tengah lingkaran
-        int centerX = x + (scaledWidth / 2);
+        // Titik tengah
+        int centerX = (x) + (scaledWidth / 2);
         int centerY = y + (scaledHeight / 2);
 
-        // Hitung panjang garis silang
-        double lineLength = Math.sqrt(2) * (scaledWidth / 2);
+        // Hitung radius
+        double radius = scaledWidth / 2.0;
 
-        // Hitung titik-titik ujung garis silang
-        int lineX1 = centerX - (int) (lineLength / 2);
-        int lineY1 = centerY - (int) (lineLength / 2);
-        int lineX2 = centerX + (int) (lineLength / 2);
-        int lineY2 = centerY + (int) (lineLength / 2);
+        // Hitung angle 
+        double angle = (x % 360) * Math.PI / 180.0;
 
-        // Gambar garis silang
-        g.setColor(Color.BLUE);
-        g.drawLine(lineX1, lineY1, lineX2, lineY2);
-        g.setColor(Color.RED);
-        g.drawLine(lineX2, lineY1, lineX1, lineY2);
+        // Garis dalam bola
+        garis_dalam_bola(g, centerX, centerY, radius, angle, Color.BLUE);
+        garis_dalam_bola(g, centerX, centerY, radius, angle + Math.PI / 2, Color.RED);
     }
 
     @Override

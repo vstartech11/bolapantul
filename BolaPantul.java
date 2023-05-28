@@ -75,9 +75,22 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         g.setColor(color);
         g.drawLine(x1, y1, x2, y2);
     }
-    
+
 
     public BolaPantul(){
+        gravitasi();
+        tombolKiri();
+        tombolInput();
+        tombolKanan();
+        tombolSlider();
+        tombolScrollBar();
+        tombolGravitasi();
+        
+
+
+    }
+    private void tombolGravitasi(){
+        
         setLayout(null);
         gravityToggleButton = new JToggleButton("Gravity: OFF");
         gravityToggleButton.addActionListener(new ActionListener() {
@@ -87,11 +100,11 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
                 gravityToggleButton.setText(isGravityEnabled ? "Gravity: ON" : "Gravity: OFF");
             }
         });
-        gravityToggleButton.setBounds(5, 5, 150, 25);
+        gravityToggleButton.setBounds(800, 5, 150, 25);
         add(gravityToggleButton);
-
-        // Tombol kanan
-        tombolKanan = new JButton(">>");
+    }
+    private void tombolKanan() {
+        JButton tombolKanan = new JButton(">>");
         tombolKanan.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -105,9 +118,14 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         });
         tombolKanan.setBounds(554, 5, 50, 25);
         add(tombolKanan);
-
-        // Tombol kiri
-        tombolKiri = new JButton("<<");
+    }
+    private void tombolInput(){
+        textField = new JTextField();
+        textField.setBounds(470, 5, 80, 26);
+        add(textField);
+    }
+    private void tombolKiri() {
+        JButton tombolKiri = new JButton("<<");
         tombolKiri.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -116,13 +134,102 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
                 } catch(NumberFormatException ex) {
                     velocityX = 0;
                 }
-                textField.setText("");
+                textField.setText("0");
             }
         });
         tombolKiri.setBounds(415, 5, 50, 25);
         add(tombolKiri);
     }
-    
+    private void tombolSlider() {
+        sliderX = new JSlider(JSlider.HORIZONTAL,0,896,x);
+        sliderX.addChangeListener(e -> {
+            if (!systemChangingSlider) {
+                x = sliderX.getValue();
+                repaint();
+            }
+        });
+        sliderX.setBounds(52, 678, 912, 20);
+        sliderX.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                isGravityEnabled = false;
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if(gravityToggleButton.isSelected()) {
+                    isGravityEnabled = true;
+                }
+            }
+        });
+        add(sliderX);
+    }
+    private void tombolScrollBar() {
+        scrollY = new JScrollBar(JScrollBar.VERTICAL, y, 50, 36, 607);
+        scrollY.addAdjustmentListener(e -> {
+            y = scrollY.getValue();
+            repaint();
+        });
+        scrollY.addAdjustmentListener(e -> {
+            if (!systemChangingSlider) {
+                y = scrollY.getValue();
+                repaint();
+            }
+        });
+        scrollY.setBounds(1017, 54, 20, 602);
+        scrollY.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                isGravityEnabled = false;
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if(gravityToggleButton.isSelected()) {
+                    isGravityEnabled = true;
+                }
+            }
+        });
+        add(scrollY);
+    }
+    private void gravitasi(){
+        setOpaque(false);
+        new Timer(30, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                velocityX *= gesekan;
+                if(Math.abs(velocityX) < 0.1) {
+                    velocityX = 0;
+                }
+
+                x += velocityX;
+                if(x < 0.1) {
+                    velocityX = -elasticity * velocityX;
+                    x = 0;
+                }
+                if(x + width > widthCanvas+10) {
+                    velocityX = -elasticity * velocityX;
+                    x = (widthCanvas+10) - width;
+                }
+                sliderX.setValue(x);
+                scrollY.setValue(y);
+                
+                if(isGravityEnabled) {
+                    velocityY += acceleration;
+                    y += velocityY;
+                    if(y + height > heightCanvas-32) {
+                        velocityY = -elasticity * velocityY;
+                        y = (heightCanvas-32) - height;
+                    }
+                    // Sistem yang merubah slider agar tidak bertabrakan sama kondisi jika slider di tekan)
+                    systemChangingSlider = true;
+                    sliderX.setValue(x);
+                    scrollY.setValue(y);
+                    systemChangingSlider = false;
+                }
+                repaint();
+            }
+        }).start();
+    }
     public static  void main(String[] args) {
         JFrame frame = new JFrame("Bola GLBB");
         frame.getContentPane().setBackground(Color.WHITE);

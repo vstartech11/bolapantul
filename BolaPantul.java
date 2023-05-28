@@ -76,6 +76,53 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         g.drawLine(x1, y1, x2, y2);
     }
     
+
+    public BolaPantul(){
+        setLayout(null);
+        gravityToggleButton = new JToggleButton("Gravity: OFF");
+        gravityToggleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                isGravityEnabled = gravityToggleButton.isSelected();
+                gravityToggleButton.setText(isGravityEnabled ? "Gravity: ON" : "Gravity: OFF");
+            }
+        });
+        gravityToggleButton.setBounds(5, 5, 150, 25);
+        add(gravityToggleButton);
+
+        // Tombol kanan
+        tombolKanan = new JButton(">>");
+        tombolKanan.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    velocityX = Integer.parseInt(textField.getText());
+                } catch(NumberFormatException ex) {
+                    velocityX = 0;
+                }
+                textField.setText("");
+            }
+        });
+        tombolKanan.setBounds(554, 5, 50, 25);
+        add(tombolKanan);
+
+        // Tombol kiri
+        tombolKiri = new JButton("<<");
+        tombolKiri.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    velocityX = -Integer.parseInt(textField.getText());
+                } catch(NumberFormatException ex) {
+                    velocityX = 0;
+                }
+                textField.setText("");
+            }
+        });
+        tombolKiri.setBounds(415, 5, 50, 25);
+        add(tombolKiri);
+    }
+    
     public static  void main(String[] args) {
         JFrame frame = new JFrame("Bola GLBB");
         frame.getContentPane().setBackground(Color.WHITE);

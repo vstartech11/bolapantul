@@ -1,10 +1,11 @@
 import java.awt.*;
+import java.awt.color.ColorSpace;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.image.BufferedImage;
 
-public class BolaPantul extends JPanel implements ChangeListener, ActionListener {
+public class nonanti extends JPanel implements ChangeListener, ActionListener{
     private BufferedImage image;
     private int x = 0;
     private int y = 450;
@@ -30,25 +31,26 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         x = sliderX.getValue();
         repaint();
     }
-
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.setColor(Color.BLACK);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        super.paintComponent(g2d);
+        g2d.setColor(Color.BLACK);
         int topY = (int) (getHeight() * 0.05);
-        g.drawLine(0, topY, getWidth(), topY);
+        g2d.drawLine(0, topY, getWidth(), topY);
         int bottomY = (int) (getHeight() * 0.95);
-        g.drawLine(0, bottomY, getWidth(), bottomY);
-        g.drawLine(1016, 677, 1016, 35);
+        g2d.drawLine(0, bottomY, getWidth(), bottomY);
+        g2d.drawLine(1016,677,1016,35);
 
         // Size bola
-        double scale = (double) y / heightCanvas;
-        int scaledWidth = (int) (width * scale);
-        int scaledHeight = (int) (height * scale);
-
+        double scale = (double)y / heightCanvas;
+        int scaledWidth = (int)(width * scale);
+        int scaledHeight = (int)(height * scale);
+        
         // Draw bola
-        g.setColor(new Color(82, 82, 216));
-        gambarBola(g, x, y, scaledWidth, scaledHeight);
+        g2d.setColor(new Color(82, 82, 216));
+        gambarBola(g2d, x, y, scaledWidth, scaledHeight);
 
         // Titik tengah
         int centerX = (x) + (scaledWidth / 2);
@@ -57,41 +59,41 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         // Hitung radius
         double radius = scaledWidth / 2.0;
 
-        // Hitung angle
+        // Hitung angle 
         double angle = (x % 360) * Math.PI / 180.0;
 
         // Garis dalam bola
-        garis_dalam_bola(g, centerX, centerY, radius, angle, Color.BLUE);
-        garis_dalam_bola(g, centerX, centerY, radius, angle + Math.PI / 2, Color.RED);
+        garis_dalam_bola(g2d, centerX, centerY, radius, angle, Color.BLUE);
+        garis_dalam_bola(g2d, centerX, centerY, radius, angle + Math.PI / 2, Color.RED);
     }
-
-    private void gambarBola(Graphics g, int x, int y, int width, int height) {
-        int centerX = x + (width / 2);
-        int centerY = y + (height / 2);
-        int radius = width / 2;
+    private void gambarBola(Graphics2D g,int x, int y,int width,int height){
+        int centerX = x + (width/2);
+        int centerY = y + (height/2);
+        int radius = width/2;
 
         for (int i = 0; i < 360; i++) {
-            double angle = i * Math.PI / 180.0;
-            int x1 = (int) (centerX + radius * Math.cos(angle));
-            int y1 = (int) (centerY + radius * Math.sin(angle));
-            int x2 = (int) (centerX + (radius - 1) * Math.cos(angle));
-            int y2 = (int) (centerY + (radius - 1) * Math.sin(angle));
-            g.drawLine(x1, y1, x2, y2);
-        }
+        double angle = i * Math.PI / 180.0;
+        int x1 = (int) (centerX + radius * Math.cos(angle));
+        int y1 = (int) (centerY + radius * Math.sin(angle));
+        int x2 = (int) (centerX + (radius - 1) * Math.cos(angle));
+        int y2 = (int) (centerY + (radius - 1) * Math.sin(angle));
+        g.drawLine(x1, y1, x2, y2);
+    }
     }
 
     // Rotasi Bola
-    private void garis_dalam_bola(Graphics g, int centerX, int centerY, double radius, double angle, Color color) {
+    private void garis_dalam_bola(Graphics2D g, int centerX, int centerY, double radius, double angle, Color color) {
         int x1 = centerX + (int) (radius * Math.cos(angle));
         int y1 = centerY + (int) (radius * Math.sin(angle));
         int x2 = centerX - (int) (radius * Math.cos(angle));
         int y2 = centerY - (int) (radius * Math.sin(angle));
-
+        
         g.setColor(color);
         g.drawLine(x1, y1, x2, y2);
     }
 
-    public BolaPantul() {
+
+    public nonanti(){
         gravitasi();
         tombolKiri();
         tombolInput();
@@ -100,9 +102,8 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         tombolScrollBar();
         tombolGravitasi();
     }
-
-    private void tombolGravitasi() {
-
+    private void tombolGravitasi(){
+        
         setLayout(null);
         gravityToggleButton = new JToggleButton("Gravity: OFF");
         gravityToggleButton.addActionListener(new ActionListener() {
@@ -115,7 +116,6 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         gravityToggleButton.setBounds(800, 5, 150, 25);
         add(gravityToggleButton);
     }
-
     private void tombolKanan() {
         JButton tombolKanan = new JButton(">>");
         tombolKanan.addActionListener(new ActionListener() {
@@ -123,7 +123,7 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
             public void actionPerformed(ActionEvent e) {
                 try {
                     velocityX = Integer.parseInt(textField.getText());
-                } catch (NumberFormatException ex) {
+                } catch(NumberFormatException ex) {
                     velocityX = 0;
                 }
                 textField.setText("");
@@ -132,13 +132,11 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         tombolKanan.setBounds(554, 5, 50, 25);
         add(tombolKanan);
     }
-
-    private void tombolInput() {
+    private void tombolInput(){
         textField = new JTextField();
         textField.setBounds(470, 5, 80, 26);
         add(textField);
     }
-
     private void tombolKiri() {
         JButton tombolKiri = new JButton("<<");
         tombolKiri.addActionListener(new ActionListener() {
@@ -146,7 +144,7 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
             public void actionPerformed(ActionEvent e) {
                 try {
                     velocityX = -Integer.parseInt(textField.getText());
-                } catch (NumberFormatException ex) {
+                } catch(NumberFormatException ex) {
                     velocityX = 0;
                 }
                 textField.setText("0");
@@ -155,9 +153,8 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         tombolKiri.setBounds(415, 5, 50, 25);
         add(tombolKiri);
     }
-
     private void tombolSlider() {
-        sliderX = new JSlider(JSlider.HORIZONTAL, 0, 896, x);
+        sliderX = new JSlider(JSlider.HORIZONTAL,0,896,x);
         sliderX.addChangeListener(e -> {
             if (!systemChangingSlider) {
                 x = sliderX.getValue();
@@ -173,14 +170,13 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (gravityToggleButton.isSelected()) {
+                if(gravityToggleButton.isSelected()) {
                     isGravityEnabled = true;
                 }
             }
         });
         add(sliderX);
     }
-
     private void tombolScrollBar() {
         scrollY = new JScrollBar(JScrollBar.VERTICAL, y, 50, 36, 607);
         scrollY.addAdjustmentListener(e -> {
@@ -202,41 +198,40 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (gravityToggleButton.isSelected()) {
+                if(gravityToggleButton.isSelected()) {
                     isGravityEnabled = true;
                 }
             }
         });
         add(scrollY);
     }
-
-    private void gravitasi() {
+    private void gravitasi(){
         setOpaque(false);
         new Timer(30, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 velocityX *= gesekan;
-                if (Math.abs(velocityX) < 0.1) {
+                if(Math.abs(velocityX) < 0.1) {
                     velocityX = 0;
                 }
 
                 x += velocityX;
-                if (x < 0.1) {
+                if(x < 0.1) {
                     velocityX = -elasticity * velocityX;
                     x = 0;
                 }
-                if (x + width > widthCanvas + 10) {
+                if(x + width > widthCanvas+10) {
                     velocityX = -elasticity * velocityX;
-                    x = (widthCanvas + 10) - width;
+                    x = (widthCanvas+10) - width;
                 }
                 sliderX.setValue(x);
                 scrollY.setValue(y);
-
-                if (isGravityEnabled) {
+                
+                if(isGravityEnabled) {
                     velocityY += acceleration;
                     y += velocityY;
-                    if (y + height > heightCanvas - 32) {
+                    if(y + height > heightCanvas-32) {
                         velocityY = -elasticity * velocityY;
-                        y = (heightCanvas - 32) - height;
+                        y = (heightCanvas-32) - height;
                     }
                     // Sistem yang merubah slider agar tidak bertabrakan sama kondisi jika slider di tekan)
                     systemChangingSlider = true;
@@ -248,11 +243,10 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
             }
         }).start();
     }
-
-    public static void main(String[] args) {
+    public static  void main(String[] args) {
         JFrame frame = new JFrame("Bola GLBB");
         frame.getContentPane().setBackground(Color.WHITE);
-        frame.getContentPane().add(new BolaPantul());
+        frame.getContentPane().add(new nonanti());
         frame.setSize(widthCanvas, heightCanvas);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);

@@ -19,6 +19,8 @@ public class tesAA extends JPanel {
 
         // Menggambar garis dengan warna hitam
         g2d.setColor(Color.BLACK);
+        int topY = (int) (getHeight() * 0.05);
+        g2d.drawLine(0, topY, getWidth(), topY);
         g2d.drawLine(50, 200, 350, 200);
 
         // Menggambar BufferedImage pada panel

@@ -1,7 +1,7 @@
 //kebutuhan import
 import java.awt.Color;
 import java.awt.Graphics;
-import javax.swing.JFrame;
+import javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JPanel;
 
 public class ilustrasi extends JPanel {
@@ -36,7 +36,7 @@ public class ilustrasi extends JPanel {
         int lineY1 = centerY - (int) (lineLength / 2);
         int lineX2 = centerX + (int) (lineLength / 2);
         int lineY2 = centerY + (int) (lineLength / 2);
-
+        
         // Gambar batas atas dan batas bawah
         g.setColor(Color.BLACK);
         int topY = (int) (getHeight() * 0.05);

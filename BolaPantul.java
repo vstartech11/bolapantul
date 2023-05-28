@@ -60,11 +60,11 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         double radius = scaledWidth / 2.0;
 
         // Hitung angle 
-        double angle = (x % 360) * Math.PI / 180.0;
+        double angle = (x % 360) * 3.141592653589793 / 180.0;
 
         // Garis dalam bola
         garis_dalam_bola(g2d, centerX, centerY, radius, angle, Color.BLUE);
-        garis_dalam_bola(g2d, centerX, centerY, radius, angle + Math.PI / 2, Color.RED);
+        garis_dalam_bola(g2d, centerX, centerY, radius, angle + 3.141592653589793 / 2, Color.RED);
     }
     private void gambarBola(Graphics2D g,int x, int y,int width,int height){
         int centerX = x + (width/2);
@@ -72,21 +72,21 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         int radius = width/2;
 
         for (int i = 0; i < 360; i++) {
-        double angle = i * Math.PI / 180.0;
-        int x1 = (int) (centerX + radius * Math.cos(angle));
-        int y1 = (int) (centerY + radius * Math.sin(angle));
-        int x2 = (int) (centerX + (radius - 1) * Math.cos(angle));
-        int y2 = (int) (centerY + (radius - 1) * Math.sin(angle));
+        double angle = i * 3.141592653589793 / 180.0;
+int x1 = (int) (centerX + radius * cosine(angle));
+int y1 = (int) (centerY + radius * sine(angle));
+int x2 = (int) (centerX + (radius - 1) * cosine(angle));
+int y2 = (int) (centerY + (radius - 1) * sine(angle));
         g.drawLine(x1, y1, x2, y2);
     }
     }
 
     // Rotasi Bola
     private void garis_dalam_bola(Graphics2D g, int centerX, int centerY, double radius, double angle, Color color) {
-        int x1 = centerX + (int) (radius * Math.cos(angle));
-        int y1 = centerY + (int) (radius * Math.sin(angle));
-        int x2 = centerX - (int) (radius * Math.cos(angle));
-        int y2 = centerY - (int) (radius * Math.sin(angle));
+        int x1 = centerX + (int) (radius * cosine(angle));
+        int y1 = centerY + (int) (radius * sine(angle));
+        int x2 = centerX - (int) (radius * cosine(angle));
+        int y2 = centerY - (int) (radius * sine(angle));
         
         g.setColor(color);
         g.drawLine(x1, y1, x2, y2);
@@ -102,6 +102,43 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         tombolScrollBar();
         tombolGravitasi();
     }
+    // Menghitung cos menggunakan deret Taylor
+private static double cosine(double angle) {
+    double cos = 1.0;
+    double term = 1.0;
+    double num = 1.0;
+    double den = 1.0;
+    int sign = -1;
+
+    for (int i = 2; term > 1e-10; i += 2) {
+        num *= angle * angle;
+        den *= (i - 1) * i;
+        term = num / den;
+        cos += sign * term;
+        sign *= -1;
+    }
+
+    return cos;
+}
+
+// Menghitung sin menggunakan deret Taylor
+private static double sine(double angle) {
+    double sin = angle;
+    double term = angle;
+    double num = angle;
+    double den = 1.0;
+    int sign = -1;
+
+    for (int i = 3; term > 1e-10; i += 2) {
+        num *= angle * angle;
+        den *= (i - 1) * i;
+        term = num / den;
+        sin += sign * term;
+        sign *= -1;
+    }
+
+    return sin;
+}
     private void tombolGravitasi(){
         
         setLayout(null);
@@ -210,7 +247,7 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         new Timer(30, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 velocityX *= gesekan;
-                if(Math.abs(velocityX) < 0.1) {
+                if(velocityX < 0.1 && velocityX > -0.1) {
                     velocityX = 0;
                 }
 

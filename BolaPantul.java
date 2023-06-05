@@ -71,10 +71,10 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
 
         for (int i = 0; i < 360; i++) {
         double angle = i * 3.141592653589793 / 180.0;
-int x1 = (int) (centerX + radius * cosine(angle));
-int y1 = (int) (centerY + radius * sine(angle));
-int x2 = (int) (centerX + (radius - 1) * cosine(angle));
-int y2 = (int) (centerY + (radius - 1) * sine(angle));
+        int x1 = (int) (centerX + radius * cosine(angle));
+        int y1 = (int) (centerY + radius * sine(angle));
+        int x2 = (int) (centerX + (radius - 1) * cosine(angle));
+        int y2 = (int) (centerY + (radius - 1) * sine(angle));
         g.drawLine(x1, y1, x2, y2);
     }
     }
@@ -101,12 +101,12 @@ int y2 = (int) (centerY + (radius - 1) * sine(angle));
         tombolGravitasi();
     }
     // Menghitung cos menggunakan deret Taylor
-private static double cosine(double angle) {
-    double cos = 1.0;
-    double term = 1.0;
-    double num = 1.0;
-    double den = 1.0;
-    int sign = -1;
+    private static double cosine(double angle) {
+        double cos = 1.0;
+        double term = 1.0;
+        double num = 1.0;
+        double den = 1.0;
+        int sign = -1;
 
     for (int i = 2; term > 1e-10; i += 2) {
         num *= angle * angle;

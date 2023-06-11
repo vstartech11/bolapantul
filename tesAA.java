@@ -5,9 +5,10 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.image.BufferedImage;
 
-public class tesAA extends JPanel implements ChangeListener, ActionListener {
+public class tesAA extends JPanel implements ChangeListener, ActionListener{
     private BufferedImage buffer;
-    private int scaleFactor = 2; // faktor skala supersampling
+    private int scaleFactor = 3; // faktor skala supersampling
+    private int scalexy = scaleFactor;
     private int x = 0;
     private int y = 450;
     private static int widthCanvas = 1050;
@@ -31,28 +32,29 @@ public class tesAA extends JPanel implements ChangeListener, ActionListener {
         x = sliderX.getValue();
         repaint();
     }
-
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        
+        // // Buat buffer gambar
+        // int bufferWidth = getWidth() * scaleFactor;
+        // int bufferHeight = getHeight() * scaleFactor;
+        // buffer = new BufferedImage(bufferWidth, bufferHeight, BufferedImage.TYPE_INT_RGB);
 
-        // Buat buffer gambar
-        int bufferWidth = getWidth() * scaleFactor;
-        int bufferHeight = getHeight() * scaleFactor;
-        buffer = new BufferedImage(bufferWidth, bufferHeight, BufferedImage.TYPE_INT_RGB);
-
-        // Render dengan metode supersampling
-        render();
+        // // Render dengan metode supersampling
+        // render();
 
         // Gambar buffer gambar ke komponen
-        g.drawImage(buffer, 0, 0, getWidth(), getHeight(), null);
+        // g2d.drawImage(buffer, 0, 0, getWidth(), getHeight(), null);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g.setColor(Color.BLACK);
+        super.paintComponent(g2d);
+        g2d.setColor(Color.BLACK);
         int topY = (int) (getHeight() * 0.05);
-        g.drawLine(0, topY, getWidth(), topY);
+        g2d.drawLine(0, topY, getWidth(), topY);
         int bottomY = (int) (getHeight() * 0.95);
-        g.drawLine(0, bottomY, getWidth(), bottomY);
-        g.drawLine(1016,677,1016,35);
+        g2d.drawLine(0, bottomY, getWidth(), bottomY);
+        g2d.drawLine(1016,677,1016,35);
 
         // Size bola
         double scale = (double)y / heightCanvas;
@@ -60,12 +62,15 @@ public class tesAA extends JPanel implements ChangeListener, ActionListener {
         int scaledHeight = (int)(height * scale);
         
         // Draw bola
-        g.setColor(new Color(82, 82, 216));
-        gambarBola(g, x, y, scaledWidth, scaledHeight);
+        g2d.setColor(new Color(82, 82, 216));
+        g2d.setStroke(new BasicStroke(scalexy));
+        gambarBola(g2d, x, y, scaledWidth, scaledHeight);
+        // g2d.fillOval(x, y, scaledWidth, scaledHeight); ini menggunakan fill oval
 
         // Titik tengah
         int centerX = (x) + (scaledWidth / 2);
         int centerY = y + (scaledHeight / 2);
+
 
         // Hitung radius
         double radius = scaledWidth / 2.0;
@@ -74,8 +79,23 @@ public class tesAA extends JPanel implements ChangeListener, ActionListener {
         double angle = (x % 360) * 3.141592653589793 / 180.0;
 
         // Garis dalam bola
-        garis_dalam_bola(g, centerX, centerY, radius, angle, Color.BLUE);
-        garis_dalam_bola(g, centerX, centerY, radius, angle + 3.141592653589793 / 2, Color.RED);
+        garis_dalam_bola(g2d, centerX, centerY, radius, angle, Color.BLUE);
+        garis_dalam_bola(g2d, centerX, centerY, radius, angle + 3.141592653589793 / 2, Color.RED);
+        
+    }
+    private void gambarBola(Graphics2D g,int x, int y,int width,int height){
+        int centerX = x + (width/2);
+        int centerY = y + (height/2);
+        int radius = width/2;
+
+        for (int i = 0; i < 360; i++) {
+        double angle = i * 3.141592653589793 / 180.0;
+        int x1 = (int) (centerX + radius * cosine(angle));
+        int y1 = (int) (centerY + radius * sine(angle));
+        int x2 = (int) (centerX + (radius - 1) * cosine(angle));
+        int y2 = (int) (centerY + (radius - 1) * sine(angle));
+        g.drawLine(x1, y1, x2, y2);
+    }
     }
 
     private void render() {
@@ -129,23 +149,8 @@ public class tesAA extends JPanel implements ChangeListener, ActionListener {
         }
     }
 
-   private void gambarBola(Graphics g,int x, int y,int width,int height){
-        int centerX = x + (width/2);
-        int centerY = y + (height/2);
-        int radius = width/2;
-
-        for (int i = 0; i < 360; i++) {
-        double angle = i * 3.141592653589793 / 180.0;
-        int x1 = (int) (centerX + radius * cosine(angle));
-        int y1 = (int) (centerY + radius * sine(angle));
-        int x2 = (int) (centerX + (radius - 1) * cosine(angle));
-        int y2 = (int) (centerY + (radius - 1) * sine(angle));
-        g.drawLine(x1, y1, x2, y2);
-    }
-    }
-
     // Rotasi Bola
-    private void garis_dalam_bola(Graphics g, int centerX, int centerY, double radius, double angle, Color color) {
+    private void garis_dalam_bola(Graphics2D g, int centerX, int centerY, double radius, double angle, Color color) {
         int x1 = centerX + (int) (radius * cosine(angle));
         int y1 = centerY + (int) (radius * sine(angle));
         int x2 = centerX - (int) (radius * cosine(angle));
@@ -164,7 +169,6 @@ public class tesAA extends JPanel implements ChangeListener, ActionListener {
         tombolSlider();
         tombolScrollBar();
         tombolGravitasi();
-        
     }
     // Menghitung cos menggunakan deret Taylor
     private static double cosine(double angle) {

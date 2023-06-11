@@ -32,14 +32,16 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
     }
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g.setColor(Color.BLACK);
+        super.paintComponent(g2d);
+        g2d.setColor(Color.BLACK);
         int topY = (int) (getHeight() * 0.05);
-        g.drawLine(0, topY, getWidth(), topY);
+        g2d.drawLine(0, topY, getWidth(), topY);
         int bottomY = (int) (getHeight() * 0.95);
-        g.drawLine(0, bottomY, getWidth(), bottomY);
-        g.drawLine(1016,677,1016,35);
+        g2d.drawLine(0, bottomY, getWidth(), bottomY);
+        g2d.drawLine(1016,677,1016,35);
 
         // Size bola
         double scale = (double)y / heightCanvas;
@@ -47,8 +49,10 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         int scaledHeight = (int)(height * scale);
         
         // Draw bola
-        g.setColor(new Color(82, 82, 216));
-        gambarBola(g, x, y, scaledWidth, scaledHeight);
+        g2d.setColor(new Color(82, 82, 216));
+        g2d.setStroke(new BasicStroke(3));
+        gambarBola(g2d, x, y, scaledWidth, scaledHeight);
+        // g2d.fillOval(x, y, scaledWidth, scaledHeight); ini menggunakan fill oval
 
         // Titik tengah
         int centerX = (x) + (scaledWidth / 2);
@@ -61,10 +65,10 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
         double angle = (x % 360) * 3.141592653589793 / 180.0;
 
         // Garis dalam bola
-        garis_dalam_bola(g, centerX, centerY, radius, angle, Color.BLUE);
-        garis_dalam_bola(g, centerX, centerY, radius, angle + 3.141592653589793 / 2, Color.RED);
+        garis_dalam_bola(g2d, centerX, centerY, radius, angle, Color.BLUE);
+        garis_dalam_bola(g2d, centerX, centerY, radius, angle + 3.141592653589793 / 2, Color.RED);
     }
-    private void gambarBola(Graphics g,int x, int y,int width,int height){
+    private void gambarBola(Graphics2D g,int x, int y,int width,int height){
         int centerX = x + (width/2);
         int centerY = y + (height/2);
         int radius = width/2;
@@ -80,7 +84,7 @@ public class BolaPantul extends JPanel implements ChangeListener, ActionListener
     }
 
     // Rotasi Bola
-    private void garis_dalam_bola(Graphics g, int centerX, int centerY, double radius, double angle, Color color) {
+    private void garis_dalam_bola(Graphics2D g, int centerX, int centerY, double radius, double angle, Color color) {
         int x1 = centerX + (int) (radius * cosine(angle));
         int y1 = centerY + (int) (radius * sine(angle));
         int x2 = centerX - (int) (radius * cosine(angle));
